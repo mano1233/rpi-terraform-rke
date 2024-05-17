@@ -14,27 +14,20 @@ resource "null_resource" "raspberry_pi_bootstrap" {
 
   # for use with Ubuntu 20.10 for RPi 3 or 4 (arm64 only)
   provisioner "file" {
+    destination = "/etc/hosts"
+    content = templatefile("${path.module}/templates/hosts.tfpl",{
+      hostname = each.value.hostname
+      nodes = local.nodes
+    })
+  }
+  
+  provisioner "file" {
     source      = "files/daemon.json"
     destination = "./daemon.json"
   }
-
   # for use with Ubuntu 20.10 for RPi 3 or 4 (arm64 only)
   provisioner "remote-exec" {
     inline = [
-      # set hostname
-      "sudo hostnamectl set-hostname ${each.value.hostname}",
-      "if ! grep -qP ${each.value.hostname} /etc/hosts; then echo '127.0.1.1 ${each.value.hostname}' | sudo tee -a /etc/hosts; fi",
-
-      # there is a better way to do this but this will suffice for now
-      # populate etc hosts so that hosts can resolve each other
-      "if ! grep -q 'pinode1' /etc/hosts; then echo '192.168.1.91 pinode1' | sudo tee -a /etc/hosts; fi",
-      "if ! grep -q 'pinode2' /etc/hosts; then echo '192.168.1.92 pinode2' | sudo tee -a /etc/hosts; fi",
-      "if ! grep -q 'pinode3' /etc/hosts; then echo '192.168.1.93 pinode3' | sudo tee -a /etc/hosts; fi",
-
-      # date time config (you use UTC...right?!?)
-      "sudo timedatectl set-timezone UTC",
-      "sudo timedatectl set-ntp true",
-
       # system & package updates - then lock kernel updates
       "sudo apt-get update -y",
       "sudo apt-get -o Dpkg::Options::='--force-confnew' upgrade -y",

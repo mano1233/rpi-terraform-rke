@@ -1,0 +1,3 @@
+127.0.1.1 ${hostname}
+%{~ for node in  nodes ~}
+%{node.ip} %{node.hostname} %{node.hostname}.local

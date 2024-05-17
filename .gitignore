@@ -29,3 +29,5 @@ override.tf.json
 # example: *tfplan*
 terraform/kube_config_cluster.yml
 terraform/rke_debug.log
+
+bifrostoverseer
