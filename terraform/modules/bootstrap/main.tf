@@ -2,25 +2,25 @@
 resource "null_resource" "raspberry_pi_bootstrap" {
   # increment version here if you wish this to run again after running it the first time
   triggers = {
-    version = "0.1.2"
+    version = "0.1.3"
   }
-  for_each = local.nodes
+  for_each = var.nodes
   connection {
     type        = "ssh"
-    user        = local.user
-    private_key = file("${path.module}/../${local.private_key}")
+    user        = var.ssh_user
+    private_key = var.private_key
     host        = each.value.ip_addr
   }
 
   # for use with Ubuntu 20.10 for RPi 3 or 4 (arm64 only)
   provisioner "file" {
-    destination = "/etc/hosts"
-    content = templatefile("${path.module}/templates/hosts.tfpl",{
+    destination = "./hosts"
+    content = templatefile("${path.module}/templates/hosts.tfpl", {
       hostname = each.value.hostname
-      nodes = local.nodes
+      nodes    = var.nodes
     })
   }
-  
+
   provisioner "file" {
     source      = "files/daemon.json"
     destination = "./daemon.json"
@@ -54,6 +54,10 @@ resource "null_resource" "raspberry_pi_bootstrap" {
       "rm -f ~/daemon.json",
       "sudo systemctl enable --now docker",
 
+      "sudo rm -f /etc/hosts",
+      "cat ~/hosts | sudo tee /etc/hosts",
+      "rm -f ~/daemon.json",
+
       # check each kernel command line option and append if necessary
       "if ! grep -qP 'cgroup_enable=cpuset' /boot/firmware/cmdline.txt; then sudo sed -i.bck '$s/$/ cgroup_enable=cpuset/' /boot/firmware/cmdline.txt; fi",
       "if ! grep -qP 'cgroup_enable=memory' /boot/firmware/cmdline.txt; then sudo sed -i.bck '$s/$/ cgroup_enable=memory/' /boot/firmware/cmdline.txt; fi",
@@ -81,4 +85,45 @@ resource "time_sleep" "wait_90_seconds" {
 
 resource "null_resource" "next" {
   depends_on = [time_sleep.wait_90_seconds]
+}
+
+
+# Create a new RKE cluster using arguments
+resource "rke_cluster" "berrycluster" {
+  depends_on = [null_resource.next]
+  # rke may complain if the Docker version is newer than what Rancher has tested
+  ignore_docker_version = true
+  #disable_port_check = true
+  dynamic "nodes" {
+    for_each = var.nodes
+    content {
+      # you can use address = nodes.value.ip_addr but this may harm usage with other tf providers
+      # otherwise set the ip to name mappings within /etc/hosts
+      address = nodes.value.hostname
+      user    = var.ssh_user
+      role    = nodes.value.role
+      ssh_key = var.private_key
+    }
+  }
+
+  ## limited CNIs running on arm64
+  network {
+    plugin = "flannel"
+  }
+
+  ## default to arm64 versions that seem to work
+  system_images {
+    alpine                      = "rancher/rke-tools:v0.1.71"
+    nginx_proxy                 = "rancher/rke-tools:v0.1.71"
+    cert_downloader             = "rancher/rke-tools:v0.1.71"
+    kubernetes_services_sidecar = "rancher/rke-tools:v0.1.71"
+    nodelocal                   = "rancher/rke-tools:v0.1.71"
+    ingress                     = "rancher/nginx-ingress-controller:nginx-0.35.0-rancher2"
+    etcd                        = "rancher/coreos-etcd:v3.4.13-arm64"
+  }
+
+  upgrade_strategy {
+    drain                  = true
+    max_unavailable_worker = "20%"
+  }
 }
