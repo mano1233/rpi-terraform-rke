@@ -1,7 +1,7 @@
 
 
 module "bootstrap" {
-  source = "./terraform/modules/bootstrap"
+  source = "./modules/bootstrap"
 
   # Dependency Injection - Required Fields 
 
@@ -11,7 +11,7 @@ module "bootstrap" {
   ssh_user    = local.bootstrap.ssh_user
 }
 module "tailscale" {
-  source = "./terraform/modules/tailscale"
+  source = "./modules/tailscale"
 
   # Dependency Injection - Required Fields 
 

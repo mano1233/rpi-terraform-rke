@@ -8,7 +8,7 @@ variable "bootstrap" {
     nodes = optional(map(object({
       hostname   = string
       ip_address = string
-      role       = list(string)
+      roles      = list(string)
     })))
     private_key = optional(string)
     ssh_user    = optional(string)

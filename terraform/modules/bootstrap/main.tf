@@ -2,14 +2,14 @@
 resource "null_resource" "raspberry_pi_bootstrap" {
   # increment version here if you wish this to run again after running it the first time
   triggers = {
-    version = "0.1.3"
+    version = "0.1.4"
   }
   for_each = var.nodes
   connection {
     type        = "ssh"
     user        = var.ssh_user
     private_key = var.private_key
-    host        = each.value.ip_addr
+    host        = each.value.ip_address
   }
 
   # for use with Ubuntu 20.10 for RPi 3 or 4 (arm64 only)
@@ -22,7 +22,7 @@ resource "null_resource" "raspberry_pi_bootstrap" {
   }
 
   provisioner "file" {
-    source      = "files/daemon.json"
+    source      = "${path.module}/files/daemon.json"
     destination = "./daemon.json"
   }
   # for use with Ubuntu 20.10 for RPi 3 or 4 (arm64 only)
@@ -47,7 +47,6 @@ resource "null_resource" "raspberry_pi_bootstrap" {
       "sudo apt-get install -y docker-ce docker-ce-cli containerd.io",
       # rke may want a specific Docker version, or in the cluster.tf you can disable the Docker version check
       #"sudo apt-get install -y docker-ce=5:19.03.14~3-0~ubuntu-focal docker-ce-cli=5:19.03.14~3-0~ubuntu-focal containerd.io",
-
       # replace the contents of /etc/docker/daemon.json to enable the systemd cgroup driver
       "sudo rm -f /etc/docker/daemon.json",
       "cat ~/daemon.json | sudo tee /etc/docker/daemon.json",
@@ -57,6 +56,7 @@ resource "null_resource" "raspberry_pi_bootstrap" {
       "sudo rm -f /etc/hosts",
       "cat ~/hosts | sudo tee /etc/hosts",
       "rm -f ~/daemon.json",
+
 
       # check each kernel command line option and append if necessary
       "if ! grep -qP 'cgroup_enable=cpuset' /boot/firmware/cmdline.txt; then sudo sed -i.bck '$s/$/ cgroup_enable=cpuset/' /boot/firmware/cmdline.txt; fi",
@@ -93,6 +93,9 @@ resource "rke_cluster" "berrycluster" {
   depends_on = [null_resource.next]
   # rke may complain if the Docker version is newer than what Rancher has tested
   ignore_docker_version = true
+  enable_cri_dockerd    = false
+  kubernetes_version    = var.kubernetes_version
+
   #disable_port_check = true
   dynamic "nodes" {
     for_each = var.nodes
@@ -101,8 +104,13 @@ resource "rke_cluster" "berrycluster" {
       # otherwise set the ip to name mappings within /etc/hosts
       address = nodes.value.hostname
       user    = var.ssh_user
-      role    = nodes.value.role
+      role    = nodes.value.roles
       ssh_key = var.private_key
+    }
+  }
+  services {
+    kubelet {
+      generate_serving_certificate = true
     }
   }
 

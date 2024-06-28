@@ -1,4 +1,4 @@
 127.0.1.1 ${hostname}
 %{~ for node in nodes }
-${node.ip_addr} ${node.hostname} ${node.hostname}.local
+${node.ip_address} ${node.hostname} ${node.hostname}.local
 %{ endfor ~}

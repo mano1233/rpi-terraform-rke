@@ -1,4 +1,4 @@
-resource "hellm_release" "tailscale_operator" {
+resource "helm_release" "tailscale_operator" {
   name             = var.helm_release_name
   chart            = var.helm_chart_name
   repository       = var.helm_repo_url

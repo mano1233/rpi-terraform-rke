@@ -2,7 +2,7 @@ variable "nodes" {
   type = map(object({
     hostname   = string
     ip_address = string
-    role       = list(string)
+    roles      = list(string)
   }))
   default     = {}
   description = "(Required) Cluster nodes specification"
@@ -12,17 +12,17 @@ variable "nodes" {
   }
 
   validation {
-    condition     = alltrue(flatten([for node in nodes : [for role in node.roles : contains(["worker", "controlplane", "etcd"], role)]]))
+    condition     = alltrue(flatten([for node in var.nodes : [for role in node.roles : contains(["worker", "controlplane", "etcd"], role)]]))
     error_message = "Role must include atleast one of the following worker, controlplane, etcd"
   }
 
   validation {
-    condition     = length([for server in values(var.server_map) : server if contains(server.role, "controlplane")]) > 0
+    condition     = length([for node in values(var.nodes) : node if contains(node.roles, "controlplane")]) > 0
     error_message = "There must be at least one server with the role 'controlplane'."
   }
 
   validation {
-    condition     = length([for server in values(var.server_map) : server if contains(server.role, "etcd")]) > 3 || length(var.nodes) == 1
+    condition     = length([for node in values(var.nodes) : node if contains(node.roles, "etcd")]) >= 3 || length(var.nodes) == 1
     error_message = "There must be at least three server with the role 'etcd'."
   }
 }
@@ -37,5 +37,12 @@ variable "private_key" {
   type        = string
   description = "The string value of the private key to use for the connection"
   default     = "null"
+}
+
+variable "kubernetes_version" {
+  type        = string
+  default     = "v1.24.17-rancher1-1"
+  description = "RKE Kubernetes Version"
+
 }
 

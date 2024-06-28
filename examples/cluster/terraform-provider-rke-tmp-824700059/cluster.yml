@@ -1,0 +1,403 @@
+nodes:
+- address: asgard
+  port: ""
+  internal_address: ""
+  role:
+  - controlplane
+  - worker
+  - etcd
+  hostname_override: ""
+  user: bifrostoverseer
+  docker_socket: ""
+  ssh_key: |
+    -----BEGIN OPENSSH PRIVATE KEY-----
+    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
+    -----END OPENSSH PRIVATE KEY-----
+  ssh_key_path: ""
+  ssh_cert: ""
+  ssh_cert_path: ""
+  labels: {}
+  taints: []
+- address: jotunheim
+  port: ""
+  internal_address: ""
+  role:
+  - worker
+  - etcd
+  hostname_override: ""
+  user: bifrostoverseer
+  docker_socket: ""
+  ssh_key: |
+    -----BEGIN OPENSSH PRIVATE KEY-----
+    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
+    -----END OPENSSH PRIVATE KEY-----
+  ssh_key_path: ""
+  ssh_cert: ""
+  ssh_cert_path: ""
+  labels: {}
+  taints: []
+- address: nidavellir
+  port: ""
+  internal_address: ""
+  role:
+  - worker
+  - etcd
+  hostname_override: ""
+  user: bifrostoverseer
+  docker_socket: ""
+  ssh_key: |
+    -----BEGIN OPENSSH PRIVATE KEY-----
+    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
+    -----END OPENSSH PRIVATE KEY-----
+  ssh_key_path: ""
+  ssh_cert: ""
+  ssh_cert_path: ""
+  labels: {}
+  taints: []
+services:
+  etcd:
+    image: ""
+    extra_args: {}
+    extra_args_array: {}
+    extra_binds: []
+    extra_env: []
+    win_extra_args: {}
+    win_extra_args_array: {}
+    win_extra_binds: []
+    win_extra_env: []
+    external_urls: []
+    ca_cert: ""
+    cert: ""
+    key: ""
+    path: ""
+    uid: 0
+    gid: 0
+    snapshot: null
+    retention: ""
+    creation: ""
+    backup_config: null
+  kube-api:
+    image: ""
+    extra_args: {}
+    extra_args_array: {}
+    extra_binds: []
+    extra_env: []
+    win_extra_args: {}
+    win_extra_args_array: {}
+    win_extra_binds: []
+    win_extra_env: []
+    service_cluster_ip_range: ""
+    service_node_port_range: ""
+    pod_security_policy: false
+    pod_security_configuration: ""
+    always_pull_images: false
+    secrets_encryption_config: null
+    audit_log: null
+    admission_configuration: null
+    event_rate_limit: null
+  kube-controller:
+    image: ""
+    extra_args: {}
+    extra_args_array: {}
+    extra_binds: []
+    extra_env: []
+    win_extra_args: {}
+    win_extra_args_array: {}
+    win_extra_binds: []
+    win_extra_env: []
+    cluster_cidr: ""
+    service_cluster_ip_range: ""
+  scheduler:
+    image: ""
+    extra_args: {}
+    extra_args_array: {}
+    extra_binds: []
+    extra_env: []
+    win_extra_args: {}
+    win_extra_args_array: {}
+    win_extra_binds: []
+    win_extra_env: []
+  kubelet:
+    image: ""
+    extra_args: {}
+    extra_args_array: {}
+    extra_binds: []
+    extra_env: []
+    win_extra_args: {}
+    win_extra_args_array: {}
+    win_extra_binds: []
+    win_extra_env: []
+    cluster_domain: cluster.local
+    infra_container_image: ""
+    cluster_dns_server: ""
+    fail_swap_on: false
+    generate_serving_certificate: true
+  kubeproxy:
+    image: ""
+    extra_args: {}
+    extra_args_array: {}
+    extra_binds: []
+    extra_env: []
+    win_extra_args: {}
+    win_extra_args_array: {}
+    win_extra_binds: []
+    win_extra_env: []
+network:
+  plugin: flannel
+  options: {}
+  mtu: 0
+  node_selector: {}
+  update_strategy: null
+  tolerations: []
+authentication:
+  strategy: ""
+  sans: []
+  webhook: null
+addons: ""
+addons_include: []
+system_images:
+  etcd: rancher/coreos-etcd:v3.4.13-arm64
+  alpine: rancher/rke-tools:v0.1.71
+  nginx_proxy: rancher/rke-tools:v0.1.71
+  cert_downloader: rancher/rke-tools:v0.1.71
+  kubernetes_services_sidecar: rancher/rke-tools:v0.1.71
+  kubedns: ""
+  dnsmasq: ""
+  kubedns_sidecar: ""
+  kubedns_autoscaler: ""
+  coredns: ""
+  coredns_autoscaler: ""
+  nodelocal: rancher/rke-tools:v0.1.71
+  kubernetes: ""
+  flannel: ""
+  flannel_cni: ""
+  calico_node: ""
+  calico_cni: ""
+  calico_controllers: ""
+  calico_ctl: ""
+  calico_flexvol: ""
+  canal_node: ""
+  canal_cni: ""
+  canal_controllers: ""
+  canal_flannel: ""
+  canal_flexvol: ""
+  weave_node: ""
+  weave_cni: ""
+  pod_infra_container: ""
+  ingress: rancher/nginx-ingress-controller:nginx-0.35.0-rancher2
+  ingress_backend: ""
+  ingress_webhook: ""
+  metrics_server: ""
+  windows_pod_infra_container: ""
+  aci_cni_deploy_container: ""
+  aci_host_container: ""
+  aci_opflex_container: ""
+  aci_mcast_container: ""
+  aci_ovs_container: ""
+  aci_controller_container: ""
+  aci_gbp_server_container: ""
+  aci_opflex_server_container: ""
+ssh_key_path: ""
+ssh_cert_path: ""
+ssh_agent_auth: false
+authorization:
+  mode: ""
+  options: {}
+ignore_docker_version: true
+enable_cri_dockerd: true
+kubernetes_version: v1.27.8-rancher2-2
+private_registries: []
+ingress:
+  provider: ""
+  options: {}
+  node_selector: {}
+  extra_args: {}
+  dns_policy: ""
+  extra_envs: []
+  extra_volumes: []
+  extra_volume_mounts: []
+  update_strategy: null
+  http_port: 0
+  https_port: 0
+  network_mode: ""
+  tolerations: []
+  default_backend: null
+  default_http_backend_priority_class_name: ""
+  nginx_ingress_controller_priority_class_name: ""
+  default_ingress_class: null
+cluster_name: ""
+cloud_provider:
+  name: ""
+prefix_path: ""
+win_prefix_path: ""
+addon_job_timeout: 0
+bastion_host:
+  address: ""
+  port: ""
+  user: ""
+  ssh_key: ""
+  ssh_key_path: ""
+  ssh_cert: ""
+  ssh_cert_path: ""
+  ignore_proxy_env_vars: false
+monitoring:
+  provider: ""
+  options: {}
+  node_selector: {}
+  update_strategy: null
+  replicas: null
+  tolerations: []
+  metrics_server_priority_class_name: ""
+restore:
+  restore: false
+  snapshot_name: ""
+rotate_encryption_key: false
+dns: null
+upgrade_strategy:
+  max_unavailable_worker: 20%
+  max_unavailable_controlplane: ""
+  drain: true
+  node_drain_input:
+    force: false
+    ignore_daemonsets: null
+    delete_local_data: false
+    grace_period: 0
+    timeout: 0

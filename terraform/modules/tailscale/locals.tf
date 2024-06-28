@@ -5,5 +5,5 @@ locals {
     "tailscale.com_dnsconfigs.yaml",
     "tailscale.com_proxyclasses.yaml"
   ]
-  crd_urls = [for yaml_name in local.crds_names : "${locals.crd_path}${yaml_name}"]
+  crd_urls = [for yaml_name in local.crds_names : "${local.crd_path}${yaml_name}"]
 }
