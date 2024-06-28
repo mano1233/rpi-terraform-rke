@@ -1,15 +1,5 @@
 
 
-module "bootstrap" {
-  source = "./modules/bootstrap"
-
-  # Dependency Injection - Required Fields 
-
-  # Configurable Variables - Optinal Fields 
-  nodes       = local.bootstrap.nodes
-  private_key = local.bootstrap.private_key
-  ssh_user    = local.bootstrap.ssh_user
-}
 module "tailscale" {
   source = "./modules/tailscale"
 

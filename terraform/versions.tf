@@ -1,4 +1,12 @@
 terraform {
+
+  cloud {
+    organization = "smart-home-mano"
+
+    workspaces {
+      name = "smart-home-k8s"
+    }
+  }
   required_version = ">= 0.13"
   required_providers {
     null = {
@@ -17,6 +25,10 @@ terraform {
     helm = {
       source  = "hashicorp/helm"
       version = ">= 2.4.1"
+    }
+    hcp = {
+      source  = "hashicorp/hcp"
+      version = "0.91.0"
     }
   }
 }

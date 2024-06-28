@@ -1,6 +1,3 @@
-provider "rke" {
-  log_file = "rke_debug.log"
-}
 provider "helm" {
   kubernetes {
     host                   = module.bootstrap.rke_cluster.api_server_url
