@@ -2,25 +2,25 @@
 
 variable "helm_chart_version" {
   type        = string
-  default     = "v1.66.3"
+  default     = "1.68.1"
   description = "(Optional) Version of the Helm chart."
 }
 
 variable "helm_release_name" {
   type        = string
-  default     = "tailscale"
+  default     = "tailscale-operator"
   description = "(Optional) The name of the pods that will be created by the chart."
 }
 
 variable "helm_chart_name" {
   type        = string
-  default     = "tailscale"
+  default     = "tailscale-operator"
   description = "(Optional) Helm chart NAme."
 }
 
 variable "helm_repo_url" {
   type        = string
-  default     = "tailscale"
+  default     = "https://pkgs.tailscale.com/helmcharts"
   description = "(Optional) The name of the pods that will be created by the chart."
 }
 
@@ -62,12 +62,11 @@ variable "cleanup_on_fail" {
 
 variable "client_id" {
   type        = string
-  default     = "ChangeIt"
   description = "(Required) the Id from tailscale admin panel"
 }
 
 variable "client_secret" {
   type        = string
-  default     = "ChangeIt"
   description = "(Required) the secret from tailscale admin panel"
 }
+

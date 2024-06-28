@@ -7,8 +7,6 @@ variable "tailscale" {
   type = object({
     atomic             = optional(bool)
     cleanup_on_fail    = optional(bool)
-    client_id          = optional(string)
-    client_secret      = optional(string)
     create_namespace   = optional(bool)
     helm_chart_name    = optional(string)
     helm_chart_version = optional(string)
@@ -21,13 +19,11 @@ variable "tailscale" {
   default = {
     atomic             = true
     cleanup_on_fail    = true
-    client_id          = "ChangeIt"
-    client_secret      = "ChangeIt"
     create_namespace   = true
-    helm_chart_name    = "tailscale"
-    helm_chart_version = "v1.66.3"
-    helm_release_name  = "tailscale"
-    helm_repo_url      = "tailscale"
+    helm_chart_name    = "tailscale-operator"
+    helm_chart_version = "1.68.1"
+    helm_release_name  = "tailscale-operator"
+    helm_repo_url      = "https://pkgs.tailscale.com/helmcharts"
     namespace          = "tailscale"
     timeout            = 300
     wait               = true
