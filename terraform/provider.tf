@@ -17,9 +17,12 @@ provider "hcp" {}
 #   cluster_ca_certificate = data.hcp_vault_secrets_app.mano_smart_home.k8s_ca_cert
 # }
 
-
+resource "hcp_vault_secrets_app" "example" {
+  app_name    = "example-app-name"
+  description = "My new app!"
+}
 
 data "hcp_vault_secrets_secret" "k8s_host" {
-  app_name = "mano_smart_home"
+  app_name = "k8s-smart-home-secrets"
   secret_name = "k8s_host"
 } 
