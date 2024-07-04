@@ -74,7 +74,7 @@ variable "docker_pull_policy" {
   description = "(Optional) The name of the pods that will be created by the chart."
 }
 
-variable "docker_iamge_webhook" {
+variable "docker_image_webhook" {
   type        = string
   default     = "quay.io/jetstack/cert-manager-webhook"
   description = "(Optional) The image name of the webhook deployment."
@@ -86,16 +86,16 @@ variable "docker_image_injector" {
   description = "(Optional) The image name of the injector deployment."
 }
 
-variable "docker_image_acmesolver" {
+variable "docker_image_acme" {
   type        = string
   default     = "quay.io/jetstack/cert-manager-acmesolver"
   description = "(Optional) The image name of the acmesolver deployment."
 }
 
-variable "docker_image_statup" {
+variable "docker_image_startup" {
   type        = string
   default     = "quay.io/jetstack/cert-manager-startupapicheck"
   description = "(Optional) The image name of the startup deployment."
-  
+
 }
 

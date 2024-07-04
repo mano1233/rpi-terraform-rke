@@ -7,3 +7,22 @@ module "tailscale" {
   {{(GetDefaults "tailscale" .)}}
 
 }
+
+module "cert-manager" {
+  source = "./modules/cert-manager"
+
+  # Configurable Variables
+  {{(GetDefaults "cert-manager" .)}}
+
+}
+
+
+module "nifikop" {
+  source = "./modules/nifikop"
+ 
+  # Configurable Variables
+  {{(GetDefaults "nifi-kop" .)}}
+
+  
+
+}

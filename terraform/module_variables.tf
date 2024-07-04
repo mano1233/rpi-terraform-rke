@@ -5,40 +5,40 @@ variable "cert-manager" {
 	(Optional) cert-manager Module will be used by default.
 	EOT
   type = object({
-    atomic                  = optional(bool)
-    cleanup_on_fail         = optional(bool)
-    create_namespace        = optional(bool)
-    docker_iamge_webhook    = optional(string)
-    docker_image            = optional(string)
-    docker_image_acmesolver = optional(string)
-    docker_image_injector   = optional(string)
-    docker_image_statup     = optional(string)
-    docker_pull_policy      = optional(string)
-    helm_chart_name         = optional(string)
-    helm_chart_version      = optional(string)
-    helm_release_name       = optional(string)
-    helm_repo_url           = optional(string)
-    namespace               = optional(string)
-    timeout                 = optional(number)
-    wait                    = optional(bool)
+    atomic                = optional(bool)
+    cleanup_on_fail       = optional(bool)
+    create_namespace      = optional(bool)
+    docker_image          = optional(string)
+    docker_image_acme     = optional(string)
+    docker_image_injector = optional(string)
+    docker_image_startup  = optional(string)
+    docker_image_webhook  = optional(string)
+    docker_pull_policy    = optional(string)
+    helm_chart_name       = optional(string)
+    helm_chart_version    = optional(string)
+    helm_release_name     = optional(string)
+    helm_repo_url         = optional(string)
+    namespace             = optional(string)
+    timeout               = optional(number)
+    wait                  = optional(bool)
   })
   default = {
-    atomic                  = true
-    cleanup_on_fail         = true
-    create_namespace        = true
-    docker_iamge_webhook    = "quay.io/jetstack/cert-manager-webhook"
-    docker_image            = "quay.io/jetstack/cert-manager-controller"
-    docker_image_acmesolver = "quay.io/jetstack/cert-manager-acmesolver"
-    docker_image_injector   = "quay.io/jetstack/cert-manager-cainjector"
-    docker_image_statup     = "quay.io/jetstack/cert-manager-startupapicheck"
-    docker_pull_policy      = "IfNotPresent"
-    helm_chart_name         = "cert-manager"
-    helm_chart_version      = "1.15.1"
-    helm_release_name       = "cert-manager"
-    helm_repo_url           = "https://charts.jetstack.io"
-    namespace               = "kube-system"
-    timeout                 = 300
-    wait                    = true
+    atomic                = true
+    cleanup_on_fail       = true
+    create_namespace      = true
+    docker_image          = "quay.io/jetstack/cert-manager-controller"
+    docker_image_acme     = "quay.io/jetstack/cert-manager-acmesolver"
+    docker_image_injector = "quay.io/jetstack/cert-manager-cainjector"
+    docker_image_startup  = "quay.io/jetstack/cert-manager-startupapicheck"
+    docker_image_webhook  = "quay.io/jetstack/cert-manager-webhook"
+    docker_pull_policy    = "IfNotPresent"
+    helm_chart_name       = "cert-manager"
+    helm_chart_version    = "1.15.1"
+    helm_release_name     = "cert-manager"
+    helm_repo_url         = "https://charts.jetstack.io"
+    namespace             = "kube-system"
+    timeout               = 300
+    wait                  = true
   }
 }
 variable "nifi-kop" {
@@ -51,7 +51,6 @@ variable "nifi-kop" {
     create_namespace   = optional(bool)
     docker_image       = optional(string)
     docker_pull_policy = optional(string)
-    docker_tag         = optional(string)
     helm_chart_name    = optional(string)
     helm_chart_version = optional(string)
     helm_release_name  = optional(string)
@@ -66,7 +65,6 @@ variable "nifi-kop" {
     create_namespace   = true
     docker_image       = "ghcr.io/konpyutaika/docker-images/nifikop"
     docker_pull_policy = "IfNotPresent"
-    docker_tag         = "1.9.0"
     helm_chart_name    = "nifikop"
     helm_chart_version = "1.9.0"
     helm_release_name  = "nifikop"
@@ -96,10 +94,10 @@ variable "palworld" {
     atomic             = true
     cleanup_on_fail    = true
     create_namespace   = true
-    helm_chart_name    = "tailscale-operator"
-    helm_chart_version = "1.68.1"
-    helm_release_name  = "tailscale-operator"
-    helm_repo_url      = "https://pkgs.tailscale.com/helmcharts"
+    helm_chart_name    = "palworld"
+    helm_chart_version = "0.2.2"
+    helm_release_name  = "palworld"
+    helm_repo_url      = "https://caleb-devops.github.io/helm-charts"
     namespace          = "tailscale"
     timeout            = 300
     wait               = true
