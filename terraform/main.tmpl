@@ -18,7 +18,7 @@ module "cert-manager" {
 
 
 module "nifikop" {
-  source = "./modules/nifikop"
+  source = "./modules/nifi-kop"
  
   # Configurable Variables
   {{(GetDefaults "nifi-kop" .)}}
