@@ -20,8 +20,26 @@ locals {
 
 
   }
+  nifi-cluster = {
+    atomic             = coalesce(var.nifi-cluster.atomic, true)
+    cleanup_on_fail    = coalesce(var.nifi-cluster.cleanup_on_fail, true)
+    cluster_name       = coalesce(var.nifi-cluster.cluster_name, "nifi-clsuter")
+    create_namespace   = coalesce(var.nifi-cluster.create_namespace, true)
+    docker_image       = coalesce(var.nifi-cluster.docker_image, "apache/nifip")
+    docker_pull_policy = coalesce(var.nifi-cluster.docker_pull_policy, "IfNotPresent")
+    helm_chart_name    = coalesce(var.nifi-cluster.helm_chart_name, "nifikop")
+    helm_chart_version = coalesce(var.nifi-cluster.helm_chart_version, "1.9.0")
+    helm_release_name  = coalesce(var.nifi-cluster.helm_release_name, "nifikop")
+    helm_repo_url      = coalesce(var.nifi-cluster.helm_repo_url, "oci://ghcr.io/konpyutaika/helm-charts/")
+    namespace          = coalesce(var.nifi-cluster.namespace, "nifi")
+    timeout            = coalesce(var.nifi-cluster.timeout, 300)
+    wait               = coalesce(var.nifi-cluster.wait, true)
+
+
+  }
   nifi-kop = {
     atomic             = coalesce(var.nifi-kop.atomic, true)
+    bootstrap_issuers  = coalesce(var.nifi-kop.bootstrap_issuers, true)
     cleanup_on_fail    = coalesce(var.nifi-kop.cleanup_on_fail, true)
     create_namespace   = coalesce(var.nifi-kop.create_namespace, true)
     docker_image       = coalesce(var.nifi-kop.docker_image, "ghcr.io/konpyutaika/docker-images/nifikop")

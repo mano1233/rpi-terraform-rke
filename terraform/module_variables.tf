@@ -41,12 +41,48 @@ variable "cert-manager" {
     wait                  = true
   }
 }
+variable "nifi-cluster" {
+  description = <<EOT
+	(Optional) nifi-cluster Module will be used by default.
+	EOT
+  type = object({
+    atomic             = optional(bool)
+    cleanup_on_fail    = optional(bool)
+    cluster_name       = optional(string)
+    create_namespace   = optional(bool)
+    docker_image       = optional(string)
+    docker_pull_policy = optional(string)
+    helm_chart_name    = optional(string)
+    helm_chart_version = optional(string)
+    helm_release_name  = optional(string)
+    helm_repo_url      = optional(string)
+    namespace          = optional(string)
+    timeout            = optional(number)
+    wait               = optional(bool)
+  })
+  default = {
+    atomic             = true
+    cleanup_on_fail    = true
+    cluster_name       = "nifi-clsuter"
+    create_namespace   = true
+    docker_image       = "apache/nifip"
+    docker_pull_policy = "IfNotPresent"
+    helm_chart_name    = "nifikop"
+    helm_chart_version = "1.9.0"
+    helm_release_name  = "nifikop"
+    helm_repo_url      = "oci://ghcr.io/konpyutaika/helm-charts/"
+    namespace          = "nifi"
+    timeout            = 300
+    wait               = true
+  }
+}
 variable "nifi-kop" {
   description = <<EOT
 	(Optional) nifi-kop Module will be used by default.
 	EOT
   type = object({
     atomic             = optional(bool)
+    bootstrap_issuers  = optional(bool)
     cleanup_on_fail    = optional(bool)
     create_namespace   = optional(bool)
     docker_image       = optional(string)
@@ -61,6 +97,7 @@ variable "nifi-kop" {
   })
   default = {
     atomic             = true
+    bootstrap_issuers  = true
     cleanup_on_fail    = true
     create_namespace   = true
     docker_image       = "ghcr.io/konpyutaika/docker-images/nifikop"

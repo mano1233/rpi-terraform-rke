@@ -64,7 +64,7 @@ variable "cleanup_on_fail" {
 
 variable "docker_image" {
   type        = string
-  default     = "ghcr.io/konpyutaika/docker-images/nifikop"
+  default     = "apache/nifip"
   description = "(Optional) The name of the pods that will be created by the chart."
 }
 
@@ -74,11 +74,9 @@ variable "docker_pull_policy" {
   description = "(Optional) The name of the pods that will be created by the chart."
 }
 
-# overall variables
-
-variable "bootstrap_issuers" {
-  type        = bool
-  default     = true
+variable "cluster_name" {
+  type        = string
+  default     = "nifi-clsuter"
   description = "(Optional) The name of the pods that will be created by the chart."
   
 }

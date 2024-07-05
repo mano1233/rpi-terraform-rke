@@ -19,9 +19,11 @@ module "cert-manager" {
 
 module "nifikop" {
   source = "./modules/nifi-kop"
- 
+  #num_crd_created_cert_manager = module.cert-manager.num_crd_created
   # Configurable Variables
   {{(GetDefaults "nifi-kop" .)}}
+
+   depends_on = [module.cert-manager]
 
   
 

@@ -15,6 +15,7 @@ resource "helm_release" "nifi-kop" {
       docker_image       = var.docker_image
       helm_chart_version = var.helm_chart_version
       docker_pull_policy = var.docker_pull_policy
+      nifi-cluster = var.cluster_name
     })
   ]
 }
@@ -38,31 +39,5 @@ resource "kubectl_manifest" "crd_install" {
   for_each   = toset(local.crd_urls)
   yaml_body  = data.http.crd_yaml_file[each.value].response_body
   depends_on = [random_uuid.example]
-  apply_only = true
-}
-
-resource "kubectl_manifest" "self-signed-issuer" {
-  count = var.bootstrap_issuers ? 1 : 0
-  yaml_body  = templatefile("${path.module}/manifests/self-signed-issuer.yaml.tfpl", {
-  
-  })
-  apply_only = true
-}
-
-resource "kubectl_manifest" "self-signed-cert" {
-  count = var.bootstrap_issuers ? 1 : 0
-  yaml_body  = templatefile("${path.module}/manifests/self-signed-cert.yaml.tfpl", {
-  
-  })
-  depends_on = [kubectl_manifest.self-signed-issuer]
-  apply_only = true
-}
-
-resource "kubectl_manifest" "nifi-issuer" {
-  count = var.bootstrap_issuers ? 1 : 0
-  yaml_body  = templatefile("${path.module}/manifests/nifif-issuer.yaml.tfpl", {
-  
-  })
-  depends_on = [kubectl_manifest.self-signed-cert]
   apply_only = true
 }
