@@ -60,7 +60,7 @@ resource "kubectl_manifest" "self-signed-cert" {
 
 resource "kubectl_manifest" "nifi-issuer" {
   count = var.bootstrap_issuers ? 1 : 0
-  yaml_body  = templatefile("${path.module}/manifests/nifif-issuer.yaml.tfpl", {
+  yaml_body  = templatefile("${path.module}/manifests/nifi-issuer.yaml.tfpl", {
   
   })
   depends_on = [kubectl_manifest.self-signed-cert]
