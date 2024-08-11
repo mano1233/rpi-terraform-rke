@@ -41,6 +41,66 @@ variable "cert-manager" {
     wait                  = true
   }
 }
+variable "kafka" {
+  description = <<EOT
+	(Optional) kafka Module will be used by default.
+	EOT
+  type = object({
+    bootstrap_node_port = optional(number)
+    brokers             = optional(number)
+    kafka_config        = optional(map(string))
+    kafka_version       = optional(string)
+    listener_tls        = optional(map(string))
+    pod_annotations     = optional(map(string))
+    ports               = optional(map(string))
+    root_log_level      = optional(string)
+    service_annotations = optional(map(string))
+  })
+  default = {
+    bootstrap_node_port = 32300
+    brokers             = 3
+    kafka_config = {
+      "auto.create.topics.enable"                           = "false"
+      "auto.leader.rebalance.enable"                        = "false"
+      "delete.topic.enable"                                 = "true"
+      "controlled.shutdown.enable"                          = "true"
+      "num.recovery.threads.per.data.dir"                   = "2"
+      "num.replica.fetchers"                                = "4"
+      "socket.send.buffer.bytes"                            = "1048576"
+      "socket.receive.buffer.bytes"                         = "1048576"
+      "socket.request.max.bytes"                            = "104857600"
+      "offsets.topic.replication.factor"                    = "3"
+      "transaction.state.log.replication.factor"            = "3"
+      "transaction.state.log.min.isr"                       = "1"
+      "default.replication.factor"                          = "3"
+      "min.insync.replicas"                                 = "1"
+      "replica.selector.class"                              = "org.apache.kafka.common.replica.RackAwareReplicaSelector"
+      "log.flush.scheduler.interval.ms"                     = "2000"
+      "client.quota.callback.class"                         = "io.strimzi.kafka.quotas.StaticQuotaCallback"
+      "client.quota.callback.static.storage.check-interval" = "600"
+      "group.initial.rebalance.delay.ms"                    = "6000"
+      "log.retention.hours"                                 = "24"
+      "num.network.threads"                                 = "4"
+      "message.timestamp.type"                              = "LogAppendTime"
+    }
+    kafka_version = "3.6.0"
+    listener_tls = {
+      "internal_tls_enabled" = "true"
+      "external_tls_enabled" = "true"
+    }
+    pod_annotations = {
+      "karpenter.sh/do-not-disrupt" = "true"
+    }
+    ports = {
+      "internal_port" = 9092
+      "external_port" = 9094
+    }
+    root_log_level = "INFO"
+    service_annotations = {
+      "consul.hashicorp.com/service-sync" = "true"
+    }
+  }
+}
 variable "nifi-cluster" {
   description = <<EOT
 	(Optional) nifi-cluster Module will be used by default.
@@ -50,6 +110,7 @@ variable "nifi-cluster" {
     cleanup_on_fail    = optional(bool)
     cluster_name       = optional(string)
     create_namespace   = optional(bool)
+    dns_suffix         = optional(string)
     docker_image       = optional(string)
     docker_pull_policy = optional(string)
     helm_chart_name    = optional(string)
@@ -63,13 +124,14 @@ variable "nifi-cluster" {
   default = {
     atomic             = true
     cleanup_on_fail    = true
-    cluster_name       = "nifi-clsuter"
+    cluster_name       = "nifi-cluster"
     create_namespace   = true
-    docker_image       = "apache/nifip"
+    dns_suffix         = "local"
+    docker_image       = "apache/nifi"
     docker_pull_policy = "IfNotPresent"
-    helm_chart_name    = "nifikop"
+    helm_chart_name    = "nifi-cluster"
     helm_chart_version = "1.9.0"
-    helm_release_name  = "nifikop"
+    helm_release_name  = "nifi-cluster"
     helm_repo_url      = "oci://ghcr.io/konpyutaika/helm-charts/"
     namespace          = "nifi"
     timeout            = 300
@@ -138,6 +200,45 @@ variable "palworld" {
     namespace          = "tailscale"
     timeout            = 300
     wait               = true
+  }
+}
+variable "strimzi_operator" {
+  description = <<EOT
+	(Optional) strimzi_operator Module will be used by default.
+	EOT
+  type = object({
+    atomic              = optional(bool)
+    cleanup_on_fail     = optional(bool)
+    create_namespace    = optional(bool)
+    docker_registry     = optional(string)
+    feature_gates       = optional(string)
+    helm_chart_name     = optional(string)
+    helm_chart_version  = optional(string)
+    helm_release_name   = optional(string)
+    helm_repo_url       = optional(string)
+    log_level           = optional(string)
+    namespace           = optional(string)
+    replicas            = optional(number)
+    timeout             = optional(number)
+    wait                = optional(bool)
+    watch_any_namespace = optional(bool)
+  })
+  default = {
+    atomic              = true
+    cleanup_on_fail     = true
+    create_namespace    = true
+    docker_registry     = "packages.af-eng.io/docker"
+    feature_gates       = "-"
+    helm_chart_name     = "strimzi-kafka-operator"
+    helm_chart_version  = "0.41.0"
+    helm_release_name   = "strimzi-kafka-operator"
+    helm_repo_url       = "oci://quay.io/strimzi-helm/"
+    log_level           = "info"
+    namespace           = "strimzi-operator"
+    replicas            = 3
+    timeout             = 300
+    wait                = true
+    watch_any_namespace = true
   }
 }
 variable "tailscale" {

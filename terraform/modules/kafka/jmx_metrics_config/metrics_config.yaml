@@ -1,0 +1,266 @@
+[
+  {
+    "is_jmx": true,
+    "collect_default_metrics": true,
+    "conf": [
+      {
+        "include": {
+          "attribute": {
+            "Count": {
+              "alias": "kafka.messages_in.rate",
+              "metric_type": "rate"
+            },
+            "OneMinuteRate": {
+              "alias": "kafka.messages_in.OneMinuteRate",
+              "metric_type": "gauge"
+            }
+          },
+          "bean_regex": "kafka\\.server:type=BrokerTopicMetrics,name=MessagesInPerSec,topic=.*",
+          "domain": "kafka.server"
+        }
+      },
+      {
+        "include": {
+          "attribute": {
+            "99thPercentile": {
+              "alias": "kafka.replication.leader_elections.99thPercentile",
+              "metric_type": "rate"
+            },
+            "Count": {
+              "alias": "kafka.replication.leader_elections.rate",
+              "metric_type": "rate"
+            },
+            "OneMinuteRate": {
+              "alias": "kafka.replication.leader_elections.OneMinuteRate",
+              "metric_type": "rate"
+            }
+          },
+          "bean": "kafka.controller:type=ControllerStats,name=LeaderElectionRateAndTimeMs",
+          "domain": "kafka.controller"
+        }
+      },
+      {
+        "include": {
+          "attribute": {
+            "99thPercentile": {
+              "alias": "kafka.replication.unclean_leader_elections.99thPercentile",
+              "metric_type": "rate"
+            },
+            "Count": {
+              "alias": "kafka.replication.unclean_leader_elections.rate",
+              "metric_type": "rate"
+            },
+            "OneMinuteRate": {
+              "alias": "kafka.replication.unclean_leader_elections.OneMinuteRate",
+              "metric_type": "rate"
+            }
+          },
+          "bean": "kafka.controller:type=ControllerStats,name=UncleanLeaderElectionsPerSec",
+          "domain": "kafka.controller"
+        }
+      },
+      {
+        "include": {
+          "attribute": {
+            "Count": {
+              "alias": "kafka.log.flush_rate.rate",
+              "metric_type": "rate"
+            },
+            "OneMinuteRate": {
+              "alias": "kafka.log.flush_rate.OneMinuteRate",
+              "metric_type": "gauge"
+            }
+          },
+          "bean": "kafka.log:type=LogFlushStats,name=LogFlushRateAndTimeMs",
+          "domain": "kafka.log"
+        }
+      },
+      {
+        "include": {
+          "attribute": {
+            "Count": {
+              "alias": "kafka.net.bytes_in.rate",
+              "metric_type": "rate"
+            },
+            "OneMinuteRate": {
+              "alias": "kafka.net.bytes_in.OneMinuteRate",
+              "metric_type": "gauge"
+            }
+          },
+          "bean_regex": "kafka\\.server:type=BrokerTopicMetrics,name=BytesInPerSec,topic=.*",
+          "domain": "kafka.server"
+        }
+      },
+      {
+        "include": {
+          "attribute": {
+            "Count": {
+              "alias": "kafka.net.bytes_out.rate",
+              "metric_type": "rate"
+            },
+            "OneMinuteRate": {
+              "alias": "kafka.net.bytes_out.OneMinuteRate",
+              "metric_type": "rate"
+            }
+          },
+          "bean_regex": "kafka\\.server:type=BrokerTopicMetrics,name=BytesOutPerSec,topic=.*",
+          "domain": "kafka.server"
+        }
+      },
+      {
+        "include": {
+          "attribute": {
+            "Value": {
+              "alias": "kafka.replication.OfflineReplicaCount",
+              "metric_type": "gauge"
+            }
+          },
+          "bean": "kafka.server:type=ReplicaManager,name=OfflineReplicaCount",
+          "domain": "kafka.server"
+        }
+      },
+      {
+        "include": {
+          "attribute": {
+            "Value": {
+              "alias": "kafka.log.size",
+              "metric_type": "gauge"
+            }
+          },
+          "bean_regex": "kafka\\.log:type=Log,name=Size,topic=.*,partition=.*",
+          "domain": "kafka.log"
+        }
+      },
+      {
+        "include": {
+          "attribute": {
+            "Value": {
+              "alias": "kafka.log.LogEndOffset",
+              "metric_type": "gauge"
+            }
+          },
+          "bean_regex": "kafka\\.log:type=Log,name=LogEndOffset,topic=.*,partition=.*",
+          "domain": "kafka.log"
+        }
+      },
+      {
+        "include": {
+          "attribute": {
+            "Value": {
+              "alias": "kafka.log.partition.size",
+              "metric_type": "gauge"
+            }
+          },
+          "bean_regex": "kafka\\.log:type=Log,name=Size,topic=(.*?),partition=(.*?)(?:,|$)",
+          "domain": "kafka.log",
+          "tags": {
+            "partition": "$2",
+            "topic": "$1"
+          }
+        }
+      },
+      {
+        "include": {
+          "attribute": {
+            "Count": {
+              "alias": "kafka.server.FetchMessageConversionsPerSec.conut",
+              "metric_type": "rate"
+            },
+            "OneMinuteRate": {
+              "alias": "kafka.server.FetchMessageConversionsPerSec.OneMinuteRate",
+              "metric_type": "gauge"
+            }
+          },
+          "bean_regex": "kafka\\.server:type=BrokerTopicMetrics,name=FetchMessageConversionsPerSec,topic=(.*?)",
+          "domain": "kafka.server",
+          "tags": {
+            "topic": "$1"
+          }
+        }
+      },
+      {
+        "include": {
+          "attribute": {
+            "Count": {
+              "alias": "kafka.server.ProduceMessageConversionsPerSec.conut",
+              "metric_type": "rate"
+            },
+            "OneMinuteRate": {
+              "alias": "kafka.server.ProduceMessageConversionsPerSec.OneMinuteRate",
+              "metric_type": "gauge"
+            }
+          },
+          "bean": "kafka.server:type=BrokerTopicMetrics,name=ProduceMessageConversionsPerSec",
+          "domain": "kafka.server"
+        }
+      },
+      {
+        "include": {
+          "attribute": {
+            "Count": {
+              "alias": "kafka.server.MessageConversionsTimeMs.Produce.conut",
+              "metric_type": "rate"
+            },
+            "OneMinuteRate": {
+              "alias": "kafka.server.MessageConversionsTimeMs.Produce.OneMinuteRate",
+              "metric_type": "gauge"
+            }
+          },
+          "bean": "kafka.network:type=RequestMetrics,name=MessageConversionsTimeMs,request=Produce",
+          "domain": "kafka.network"
+        }
+      },
+      {
+        "include": {
+          "attribute": {
+            "Count": {
+              "alias": "kafka.server.MessageConversionsTimeMs.Fetch.conut",
+              "metric_type": "rate"
+            },
+            "OneMinuteRate": {
+              "alias": "kafka.server.MessageConversionsTimeMs.Fetch.OneMinuteRate",
+              "metric_type": "gauge"
+            }
+          },
+          "bean": "kafka.network:type=RequestMetrics,name=MessageConversionsTimeMs,request=Fetch",
+          "domain": "kafka.network"
+        }
+      },
+      {
+        "include": {
+          "attribute": {
+            "Count": {
+              "alias": "kafka.server.TotalFetchRequestsPerSec.conut",
+              "metric_type": "rate"
+            },
+            "OneMinuteRate": {
+              "alias": "kafka.server.TotalFetchRequestsPerSec.OneMinuteRate",
+              "metric_type": "gauge"
+            }
+          },
+          "bean_regex": "kafka\\.server:type=BrokerTopicMetrics,name=TotalFetchRequestsPerSec,topic=(.*?)",
+          "domain": "kafka.server",
+          "tags": {
+            "topic": "$1"
+          }
+        }
+      },
+      {
+        "include": {
+          "attribute": {
+            "Count": {
+              "alias": "kafka.request.handler.avg.idle.pct.rate",
+              "metric_type": "gauge"
+            },
+            "OneMinuteRate": {
+              "alias": "kafka.request.handler.avg.idle.pct.OneMinuteRate",
+              "metric_type": "gauge"
+            }
+          },
+          "bean": "kafka.server:type=KafkaRequestHandlerPool,name=RequestHandlerAvgIdlePercent",
+          "domain": "kafka.server"
+        }
+      }
+    ]
+  }
+]

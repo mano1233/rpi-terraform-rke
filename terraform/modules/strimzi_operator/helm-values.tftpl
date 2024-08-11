@@ -1,0 +1,39 @@
+replicas: ${replicas}
+watchAnyNamespace: ${watchAnyNamespace}
+resources:
+  limits:
+    memory: ${limit_memory}
+    cpu: ${limit_cpu}
+  requests:
+    memory: ${requested_memory}
+    cpu: ${requested_cpu}
+logLevel: ${logLevel}
+defaultImageRegistry: ${defaultImageRegistry}
+annotations:
+  ad.datadoghq.com/strimzi-cluster-operator.checks: |
+    {
+      "openmetrics": {
+      "init_config": {},
+      "instances":
+        [
+          {
+            "prometheus_url": "http://%%host%%:%%port%%/metrics",
+            "namespace": "strimzi_operator",
+            "metrics": ["strimzi_reconciliations_duration_seconds_bucket", 
+            "strimzi_reconciliations_successful_total",
+            "strimzi_reconciliations_duration_seconds",
+            "strimzi_reconciliations_already_enqueued_total",
+            "strimzi_reconciliations_periodical_total",
+            "strimzi_reconciliations_total",
+            "strimzi_reconciliations_failed_total",
+            "strimzi_reconciliations_duration_seconds_max",
+            "strimzi_resource_state",
+            "strimzi_resources"]
+          }
+        ]
+      }
+    }
+  ad.datadoghq.com/strimzi-cluster-operator.logs: '[{"source": "strimzi_operator", "service": "strimzi_operator"}]'
+%{ if feature_gates != null ~} 
+featureGates: ${feature_gates}
+%{~ endif ~}

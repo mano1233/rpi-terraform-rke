@@ -44,7 +44,7 @@ resource "kubectl_manifest" "crd_install" {
 resource "kubectl_manifest" "self-signed-issuer" {
   count = var.bootstrap_issuers ? 1 : 0
   yaml_body  = templatefile("${path.module}/manifests/self-signed-issuer.yaml.tfpl", {
-  
+    cert_manager_namespace = var.cert_manager_namespace
   })
   apply_only = true
 }
@@ -52,7 +52,7 @@ resource "kubectl_manifest" "self-signed-issuer" {
 resource "kubectl_manifest" "self-signed-cert" {
   count = var.bootstrap_issuers ? 1 : 0
   yaml_body  = templatefile("${path.module}/manifests/self-signed-cert.yaml.tfpl", {
-  
+    cert_manager_namespace = var.cert_manager_namespace
   })
   depends_on = [kubectl_manifest.self-signed-issuer]
   apply_only = true
@@ -61,6 +61,7 @@ resource "kubectl_manifest" "self-signed-cert" {
 resource "kubectl_manifest" "nifi-issuer" {
   count = var.bootstrap_issuers ? 1 : 0
   yaml_body  = templatefile("${path.module}/manifests/nifi-issuer.yaml.tfpl", {
+    cert_manager_namespace = var.cert_manager_namespace
   
   })
   depends_on = [kubectl_manifest.self-signed-cert]

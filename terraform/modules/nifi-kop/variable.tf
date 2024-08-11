@@ -83,6 +83,12 @@ variable "bootstrap_issuers" {
   
 }
 
+variable "cert_manager_namespace" {
+  type        = string
+  description = "Namespace where cert-manager is installed"
+  
+}
+
 # variable "num_crd_created_cert_manager" {
 #   type        = number
 #   description = "Number of CRD created by cert-manager"

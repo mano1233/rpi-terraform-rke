@@ -1,0 +1,59 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaNodePool
+metadata:
+    namespace: strimzi
+    name: kafka
+    labels:
+        strimzi.io/cluster: ${cluster_name}
+spec:
+    jvmOptions:
+        -Xms: ${jvm_xms}
+        -Xmx: ${jvm_xmx}
+    replicas: ${replicas}
+    resources:
+        limits:
+            cpu: ${limit_cpu}
+            memory: ${limit_memory}
+        requests:
+            cpu: ${request_cpu}
+            memory: ${request_memory}
+    roles:
+    - broker
+    storage:
+        class: ${storage_class}
+        deleteClaim: ${storage_delete_claim}
+        overrides: %{ for i in range(replicas) }
+          - broker: ${i}
+            class: ${storage_class}-${zones[i%length(zones)]} %{ endfor }
+        size: ${storage_size}
+        type: persistent-claim
+    template:
+        persistentVolumeClaim:
+            metadata:
+                annotations:
+                    volumeType: local
+                    appsflyer.com/local-pvc-releaser: enabled
+        perPodServices:
+            metadata:
+                annotations:
+                    external-dns.alpha.kubernetes.io/headless-root-domain-record: true
+                    external-dns.alpha.kubernetes.io/endpoints-type: HostIP
+                    external-dns.alpha.kubernetes.io/hostname: ${cluster_name}-kafka-internal.${hosted_zone_name}
+        pod:
+            metadata:
+                annotations:
+                    ad.datadoghq.com/kafka.check_names: '["kafka"]'
+                    ad.datadoghq.com/kafka.init_configs: |
+                        ${indent(24,jmx_metrics_config)}
+                    ad.datadoghq.com/kafka.instances: '[{"host": "%%host%%", "port": "9999", "max_returned_metrics":13000}]'
+                    ad.datadoghq.com/kafka.logs: '[{"source": "kafka", "service": "kafka"}]'
+                    ad.datadoghq.com/kafka.tags: '{"component": "strimzi"}'
+                    %{~ for key, value in pod_annotations ~}
+                    ${key}: "${value}"
+                    %{~ endfor ~}
+            affinity:
+                nodeAffinity:
+                    requiredDuringSchedulingIgnoredDuringExecution:
+                        nodeSelectorTerms:
+                            - matchExpressions: ${jsonencode(node_affinity)}
+            tolerations: ${jsonencode(tolerations)}

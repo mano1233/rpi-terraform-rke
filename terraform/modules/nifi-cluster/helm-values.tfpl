@@ -3,8 +3,7 @@
 # https://konpyutaika.github.io/nifikop/docs/5_references/1_nifi_cluster/1_nifi_cluster
 
 cluster:
-  nameOverride: ${clsuter_name}
-
+  fullnameOverride: ${cluster_name}
   # -- type of the cluster: internal or external. Operator will put internal by default
   # @default -- internal
   type:
@@ -18,7 +17,7 @@ cluster:
   # -- the template to use to create nodes.
   # see https://konpyutaika.github.io/nifikop/docs/5_references/1_nifi_cluster#nificlusterspec
   # @default -- "node-%d-<cluster-name>"
-  nodeUserIdentityTemplate: "${clsuter_name}-%d"
+  nodeUserIdentityTemplate: "${cluster_name}-%d"
 
   # -- ControllerUserIdentity specifies what to call the static admin user's identity. **Warning: once defined don't change
   # this value either the operator will no longer be able to manage the cluster**
@@ -110,6 +109,7 @@ cluster:
   nifiProperties:
     overrideConfigs: |
       nifi.web.proxy.context.path=/nifi-cluster
+      nifi.sensitive.props.key=thisIsABadSensitiveKeyPassword
 
     # -- List of allowed HTTP Host header values to consider when NiFi is running securely and will be receiving
     # requests to a different host[:port] than it is bound to. Operator will generate comma separated string from list
@@ -135,7 +135,7 @@ cluster:
     overrideConfigs: |
       java.arg.4=-Djava.net.preferIPv4Stack=true
       java.arg.log4shell=-Dlog4j2.formatMsgNoLookups=true
-    nifiJvmMemory: "256m"
+    nifiJvmMemory: "512m"
   
   # -- This is only for embedded zookeeper configuration. This is ignored if `zookeeper.enabled` is true.
   zookeeperProperties:
@@ -149,31 +149,28 @@ cluster:
   
   # -- Defines configurations for nodes which can be used in list of nodes in cluster.
   #    See: https://konpyutaika.github.io/nifikop/docs/5_references/1_nifi_cluster/3_node_config
-  nodeConfigGroups: {}
-    # default-group:
-    #   isNode: true
-    #   # Extra volumes to add to the Pod spec.
-    #   # See https://konpyutaika.github.io/nifikop/docs/5_references/1_nifi_cluster/3_node_config#externalvolumeconfig
-    #   #externalVolumeConfigs: []
-    #   imagePullPolicy: IfNotPresent
-    #   storageConfigs:
-    #     - mountPath: "/opt/nifi/data"
-    #       name: data
-    #       pvcSpec:
-    #         accessModes:
-    #           - ReadWriteOnce
-    #         storageClassName: "standard"
-    #         resources:
-    #           requests:
-    #             storage: 128Mi
-    #   serviceAccountName: "default"
-    #   resourcesRequirements:
-    #     limits:
-    #       cpu: 2
-    #       memory: 4Gi
-    #     requests:
-    #       cpu: 1
-    #       memory: 2Gi
+  nodeConfigGroups: 
+    default-group:
+      isNode: true
+      # Extra volumes to add to the Pod spec.
+      # See https://konpyutaika.github.io/nifikop/docs/5_references/1_nifi_cluster/3_node_config#externalvolumeconfig
+      #externalVolumeConfigs: []
+      imagePullPolicy: ${docker_pull_policy}
+      storageConfigs:
+        - mountPath: "/opt/nifi/data"
+          name: data
+          pvcSpec:
+            accessModes:
+              - ReadWriteOnce
+            storageClassName: "local-path"
+            resources:
+              requests:
+                storage: 128Mi
+      serviceAccountName: "default"
+      resourcesRequirements:
+        requests:
+          cpu: 1
+          memory: 0.5Gi
 
   # -- Defines the list of nodes in the cluster with their id's and config to apply.
   #    See https://konpyutaika.github.io/nifikop/docs/5_references/1_nifi_cluster#nificlusterspec
@@ -205,9 +202,13 @@ cluster:
         containerPort: 9090
     # -- Provides the SSL configuration for the cluster, can be fully user provided, user provided CA or auto generated
     #    with cert-manager. See: https://konpyutaika.github.io/nifikop/docs/3_manage_nifi/1_manage_clusters/1_deploy_cluster/4_ssl_configuration
-    sslSecrets: null
-      # tlsSecretName: nifi-cluster-certs
-      # create: false
+    sslSecrets:
+      tlsSecretName: "${cluster_name}-tls"
+      create: true
+      clusterScoped: true
+      issuerRef:
+        kind: ClusterIssuer
+        name: ${nifi_issuer_name}
   # -- Additional k8s services to create and target internal listener ports. Ingress will use these to route traffic to
   # the cluster
   externalServices:
@@ -215,8 +216,8 @@ cluster:
       spec:
         type: ClusterIP
         portConfigs:
-          - port: 8080
-            internalListenerName: "http"
+          - port: 8443
+            internalListenerName: "https"
       metadata:
         labels: {}
         annotations: {}
@@ -241,25 +242,25 @@ cluster:
     #     annotations: {}
 
 ingress:
-  enabled: false
-  className: nginx
+  enabled: true
+  className: traefik
   annotations: {}
     # nginx.ingress.kubernetes.io/rewrite-target: /$2
     # nginx.ingress.kubernetes.io/configuration-snippet: |
     #   proxy_set_header 'X-ProxyContextPath' '/nifi-cluster';
     #   proxy_set_header 'X-ProxyPort' '8080';
     #   proxy_set_header 'X-ProxyScheme' 'http';
-  hosts: []
-    # - host: my-host.example.com
-    #   paths:
-    #     - path: /nifi-cluster(/|$)(.*)
-    #       pathType: Prefix
-    #       backend:
-    #         # this needs to match the externalServices config above
-    #         service:
-    #           name: "nifi-cluster-ip"
-    #           port:
-    #             number: 8080
+  hosts: 
+    - host: ${cluster_name}.${dns_suffix}
+      paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            # this needs to match the externalServices config above
+            service:
+              name: "${cluster_name}-ip"
+              port:
+                number: 8443
   tls: []
   #  - secretName: nifi-cluster-tls
   #    hosts:
@@ -448,3 +449,13 @@ zookeeper:
     enabled: false
     storageClass: standard
     size: 10Gi
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/hostname
+            operator: In
+            values:
+            - jotunheim
+            - nidavellir

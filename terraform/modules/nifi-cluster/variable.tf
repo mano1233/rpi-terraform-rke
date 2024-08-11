@@ -8,13 +8,13 @@ variable "helm_chart_version" {
 
 variable "helm_release_name" {
   type        = string
-  default     = "nifikop"
+  default     = "nifi-cluster"
   description = "(Optional) The name of the pods that will be created by the chart."
 }
 
 variable "helm_chart_name" {
   type        = string
-  default     = "nifikop"
+  default     = "nifi-cluster"
   description = "(Optional) Helm chart NAme."
 }
 
@@ -64,7 +64,7 @@ variable "cleanup_on_fail" {
 
 variable "docker_image" {
   type        = string
-  default     = "apache/nifip"
+  default     = "apache/nifi"
   description = "(Optional) The name of the pods that will be created by the chart."
 }
 
@@ -76,7 +76,19 @@ variable "docker_pull_policy" {
 
 variable "cluster_name" {
   type        = string
-  default     = "nifi-clsuter"
+  default     = "nifi-cluster"
+  description = "(Optional) The name of the pods that will be created by the chart."
+  
+}
+
+variable "nifi_issuer_name" {
+  type        = string
+  description = "(Optional) The name of the pods that will be created by the chart."
+}
+
+variable "dns_suffix" {
+  type        = string
+  default     = "local"
   description = "(Optional) The name of the pods that will be created by the chart."
   
 }

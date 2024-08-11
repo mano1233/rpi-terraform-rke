@@ -20,16 +20,106 @@ locals {
 
 
   }
+  kafka = {
+    bootstrap_node_port = coalesce(var.kafka.bootstrap_node_port, 32300)
+    brokers             = coalesce(var.kafka.brokers, 3)
+    kafka_version       = coalesce(var.kafka.kafka_version, "3.6.0")
+    root_log_level      = coalesce(var.kafka.root_log_level, "INFO")
+
+
+    kafka_config = var.kafka.kafka_config != null ? merge(var.kafka.kafka_config,
+      tomap({
+        "auto.create.topics.enable"                           = contains(keys(var.kafka.kafka_config), "auto.create.topics.enable") != false ? var.kafka.kafka_config["auto.create.topics.enable"] : "false"
+        "auto.leader.rebalance.enable"                        = contains(keys(var.kafka.kafka_config), "auto.leader.rebalance.enable") != false ? var.kafka.kafka_config["auto.leader.rebalance.enable"] : "false"
+        "client.quota.callback.class"                         = contains(keys(var.kafka.kafka_config), "client.quota.callback.class") != false ? var.kafka.kafka_config["client.quota.callback.class"] : "io.strimzi.kafka.quotas.StaticQuotaCallback"
+        "client.quota.callback.static.storage.check-interval" = contains(keys(var.kafka.kafka_config), "client.quota.callback.static.storage.check-interval") != false ? var.kafka.kafka_config["client.quota.callback.static.storage.check-interval"] : "600"
+        "controlled.shutdown.enable"                          = contains(keys(var.kafka.kafka_config), "controlled.shutdown.enable") != false ? var.kafka.kafka_config["controlled.shutdown.enable"] : "true"
+        "default.replication.factor"                          = contains(keys(var.kafka.kafka_config), "default.replication.factor") != false ? var.kafka.kafka_config["default.replication.factor"] : "3"
+        "delete.topic.enable"                                 = contains(keys(var.kafka.kafka_config), "delete.topic.enable") != false ? var.kafka.kafka_config["delete.topic.enable"] : "true"
+        "group.initial.rebalance.delay.ms"                    = contains(keys(var.kafka.kafka_config), "group.initial.rebalance.delay.ms") != false ? var.kafka.kafka_config["group.initial.rebalance.delay.ms"] : "6000"
+        "log.flush.scheduler.interval.ms"                     = contains(keys(var.kafka.kafka_config), "log.flush.scheduler.interval.ms") != false ? var.kafka.kafka_config["log.flush.scheduler.interval.ms"] : "2000"
+        "log.retention.hours"                                 = contains(keys(var.kafka.kafka_config), "log.retention.hours") != false ? var.kafka.kafka_config["log.retention.hours"] : "24"
+        "message.timestamp.type"                              = contains(keys(var.kafka.kafka_config), "message.timestamp.type") != false ? var.kafka.kafka_config["message.timestamp.type"] : "LogAppendTime"
+        "min.insync.replicas"                                 = contains(keys(var.kafka.kafka_config), "min.insync.replicas") != false ? var.kafka.kafka_config["min.insync.replicas"] : "1"
+        "num.network.threads"                                 = contains(keys(var.kafka.kafka_config), "num.network.threads") != false ? var.kafka.kafka_config["num.network.threads"] : "4"
+        "num.recovery.threads.per.data.dir"                   = contains(keys(var.kafka.kafka_config), "num.recovery.threads.per.data.dir") != false ? var.kafka.kafka_config["num.recovery.threads.per.data.dir"] : "2"
+        "num.replica.fetchers"                                = contains(keys(var.kafka.kafka_config), "num.replica.fetchers") != false ? var.kafka.kafka_config["num.replica.fetchers"] : "4"
+        "offsets.topic.replication.factor"                    = contains(keys(var.kafka.kafka_config), "offsets.topic.replication.factor") != false ? var.kafka.kafka_config["offsets.topic.replication.factor"] : "3"
+        "replica.selector.class"                              = contains(keys(var.kafka.kafka_config), "replica.selector.class") != false ? var.kafka.kafka_config["replica.selector.class"] : "org.apache.kafka.common.replica.RackAwareReplicaSelector"
+        "socket.receive.buffer.bytes"                         = contains(keys(var.kafka.kafka_config), "socket.receive.buffer.bytes") != false ? var.kafka.kafka_config["socket.receive.buffer.bytes"] : "1048576"
+        "socket.request.max.bytes"                            = contains(keys(var.kafka.kafka_config), "socket.request.max.bytes") != false ? var.kafka.kafka_config["socket.request.max.bytes"] : "104857600"
+        "socket.send.buffer.bytes"                            = contains(keys(var.kafka.kafka_config), "socket.send.buffer.bytes") != false ? var.kafka.kafka_config["socket.send.buffer.bytes"] : "1048576"
+        "transaction.state.log.min.isr"                       = contains(keys(var.kafka.kafka_config), "transaction.state.log.min.isr") != false ? var.kafka.kafka_config["transaction.state.log.min.isr"] : "1"
+        "transaction.state.log.replication.factor" = contains(keys(var.kafka.kafka_config), "transaction.state.log.replication.factor") != false ? var.kafka.kafka_config["transaction.state.log.replication.factor"] : "3" }
+      )) : {
+      "auto.create.topics.enable"                           = "false"
+      "auto.leader.rebalance.enable"                        = "false"
+      "client.quota.callback.class"                         = "io.strimzi.kafka.quotas.StaticQuotaCallback"
+      "client.quota.callback.static.storage.check-interval" = "600"
+      "controlled.shutdown.enable"                          = "true"
+      "default.replication.factor"                          = "3"
+      "delete.topic.enable"                                 = "true"
+      "group.initial.rebalance.delay.ms"                    = "6000"
+      "log.flush.scheduler.interval.ms"                     = "2000"
+      "log.retention.hours"                                 = "24"
+      "message.timestamp.type"                              = "LogAppendTime"
+      "min.insync.replicas"                                 = "1"
+      "num.network.threads"                                 = "4"
+      "num.recovery.threads.per.data.dir"                   = "2"
+      "num.replica.fetchers"                                = "4"
+      "offsets.topic.replication.factor"                    = "3"
+      "replica.selector.class"                              = "org.apache.kafka.common.replica.RackAwareReplicaSelector"
+      "socket.receive.buffer.bytes"                         = "1048576"
+      "socket.request.max.bytes"                            = "104857600"
+      "socket.send.buffer.bytes"                            = "1048576"
+      "transaction.state.log.min.isr"                       = "1"
+      "transaction.state.log.replication.factor"            = "3"
+    }
+
+    listener_tls = var.kafka.listener_tls != null ? merge(var.kafka.listener_tls,
+      tomap({
+        "external_tls_enabled" = contains(keys(var.kafka.listener_tls), "external_tls_enabled") != false ? var.kafka.listener_tls["external_tls_enabled"] : "true"
+        "internal_tls_enabled" = contains(keys(var.kafka.listener_tls), "internal_tls_enabled") != false ? var.kafka.listener_tls["internal_tls_enabled"] : "true" }
+      )) : {
+      "external_tls_enabled" = "true"
+      "internal_tls_enabled" = "true"
+    }
+
+    pod_annotations = var.kafka.pod_annotations != null ? merge(var.kafka.pod_annotations,
+      tomap({
+        "karpenter.sh/do-not-disrupt" = contains(keys(var.kafka.pod_annotations), "karpenter.sh/do-not-disrupt") != false ? var.kafka.pod_annotations["karpenter.sh/do-not-disrupt"] : "true" }
+      )) : {
+      "karpenter.sh/do-not-disrupt" = "true"
+    }
+
+    ports = var.kafka.ports != null ? merge(var.kafka.ports,
+      tomap({
+        "external_port" = contains(keys(var.kafka.ports), "external_port") != false ? var.kafka.ports["external_port"] : 9094
+        "internal_port" = contains(keys(var.kafka.ports), "internal_port") != false ? var.kafka.ports["internal_port"] : 9092 }
+      )) : {
+      "external_port" = 9094
+      "internal_port" = 9092
+    }
+
+    service_annotations = var.kafka.service_annotations != null ? merge(var.kafka.service_annotations,
+      tomap({
+        "consul.hashicorp.com/service-sync" = contains(keys(var.kafka.service_annotations), "consul.hashicorp.com/service-sync") != false ? var.kafka.service_annotations["consul.hashicorp.com/service-sync"] : "true" }
+      )) : {
+      "consul.hashicorp.com/service-sync" = "true"
+    }
+
+  }
   nifi-cluster = {
     atomic             = coalesce(var.nifi-cluster.atomic, true)
     cleanup_on_fail    = coalesce(var.nifi-cluster.cleanup_on_fail, true)
-    cluster_name       = coalesce(var.nifi-cluster.cluster_name, "nifi-clsuter")
+    cluster_name       = coalesce(var.nifi-cluster.cluster_name, "nifi-cluster")
     create_namespace   = coalesce(var.nifi-cluster.create_namespace, true)
-    docker_image       = coalesce(var.nifi-cluster.docker_image, "apache/nifip")
+    dns_suffix         = coalesce(var.nifi-cluster.dns_suffix, "local")
+    docker_image       = coalesce(var.nifi-cluster.docker_image, "apache/nifi")
     docker_pull_policy = coalesce(var.nifi-cluster.docker_pull_policy, "IfNotPresent")
-    helm_chart_name    = coalesce(var.nifi-cluster.helm_chart_name, "nifikop")
+    helm_chart_name    = coalesce(var.nifi-cluster.helm_chart_name, "nifi-cluster")
     helm_chart_version = coalesce(var.nifi-cluster.helm_chart_version, "1.9.0")
-    helm_release_name  = coalesce(var.nifi-cluster.helm_release_name, "nifikop")
+    helm_release_name  = coalesce(var.nifi-cluster.helm_release_name, "nifi-cluster")
     helm_repo_url      = coalesce(var.nifi-cluster.helm_repo_url, "oci://ghcr.io/konpyutaika/helm-charts/")
     namespace          = coalesce(var.nifi-cluster.namespace, "nifi")
     timeout            = coalesce(var.nifi-cluster.timeout, 300)
@@ -65,6 +155,25 @@ locals {
     namespace          = coalesce(var.palworld.namespace, "tailscale")
     timeout            = coalesce(var.palworld.timeout, 300)
     wait               = coalesce(var.palworld.wait, true)
+
+
+  }
+  strimzi_operator = {
+    atomic              = coalesce(var.strimzi_operator.atomic, true)
+    cleanup_on_fail     = coalesce(var.strimzi_operator.cleanup_on_fail, true)
+    create_namespace    = coalesce(var.strimzi_operator.create_namespace, true)
+    docker_registry     = coalesce(var.strimzi_operator.docker_registry, "packages.af-eng.io/docker")
+    feature_gates       = coalesce(var.strimzi_operator.feature_gates, "-")
+    helm_chart_name     = coalesce(var.strimzi_operator.helm_chart_name, "strimzi-kafka-operator")
+    helm_chart_version  = coalesce(var.strimzi_operator.helm_chart_version, "0.41.0")
+    helm_release_name   = coalesce(var.strimzi_operator.helm_release_name, "strimzi-kafka-operator")
+    helm_repo_url       = coalesce(var.strimzi_operator.helm_repo_url, "oci://quay.io/strimzi-helm/")
+    log_level           = coalesce(var.strimzi_operator.log_level, "info")
+    namespace           = coalesce(var.strimzi_operator.namespace, "strimzi-operator")
+    replicas            = coalesce(var.strimzi_operator.replicas, 3)
+    timeout             = coalesce(var.strimzi_operator.timeout, 300)
+    wait                = coalesce(var.strimzi_operator.wait, true)
+    watch_any_namespace = coalesce(var.strimzi_operator.watch_any_namespace, true)
 
 
   }

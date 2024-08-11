@@ -1,0 +1,91 @@
+version: ${version}
+logging:
+  type: inline
+  loggers:
+    kafka.root.logger.level: ${root_log_level}
+resources:
+  requests:
+    memory: ${request_memory}
+    cpu: ${request_cpu}
+  limits:
+    memory: ${limit_memory}
+    cpu: ${limit_cpu}
+jvmOptions:
+  -Xms: ${jvm_xms}
+  -Xmx: ${jvm_xmx}
+listeners:
+  - name: plain
+    port: ${internal_port}
+    type: internal
+    tls: ${internal_tls_enabled}
+    authentication:
+      type: tls
+    configuration:
+      brokers: %{ for i in range(replicas) }
+        - broker: ${i} %{ endfor }
+      useServiceDnsDomain: false
+  # Give each kafka a port to be accessed from anywhere across all EKS nodes.
+  # First client comunication done by port 32300 -> All kafka pods ports and the nodes they are running on, gets returned to the client.
+  - name: external
+    port: ${external_port}
+    type: nodeport
+    tls: ${external_tls_enabled}
+    authentication:
+      type: tls
+    configuration:
+      preferredNodePortAddressType: InternalIP
+      bootstrap:
+        nodePort: ${bootstrap_node_port}
+      brokers: %{ for i in range(replicas) }
+        - broker: ${i}
+          nodePort: ${sum([i,32000])} %{ endfor }
+authorization:
+  type: simple
+config: %{ for key, value in kafka_config }
+  ${key} : ${value} %{ endfor }
+template:
+  podDisruptionBudget:
+    maxUnavailable: 0
+  persistentVolumeClaim:
+    metadata:
+      annotations:
+        volumeType: local
+        appsflyer.com/local-pvc-releaser: enabled
+  pod:
+    metadata:
+      annotations:
+        ad.datadoghq.com/kafka.check_names: '["kafka"]'
+        ad.datadoghq.com/kafka.init_configs: |
+          ${indent(10,jmx_metrics_config)}
+        ad.datadoghq.com/kafka.instances: '[{"host": "%%host%%", "port": "9999", "max_returned_metrics":13000}]'
+        ad.datadoghq.com/kafka.logs: '[{"source": "kafka", "service": "kafka"}]'
+        ad.datadoghq.com/kafka.tags: '{"component": "strimzi"}'
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms: 
+            - matchExpressions: ${jsonencode(node_affinity)}
+    tolerations: ${jsonencode(tolerations)}
+  externalBootstrapService:
+    metadata:
+      annotations:
+        external-dns.alpha.kubernetes.io/hostname: ${cluster_name}-kafka-external.${hosted_zone_name}
+        external-dns.alpha.kubernetes.io/endpoints-type: HostIP
+        external-dns.alpha.kubernetes.io/ttl: "60"
+  brokersService:
+    metadata:
+      annotations:
+        external-dns.alpha.kubernetes.io/headless-root-domain-record: "true"
+        external-dns.alpha.kubernetes.io/endpoints-type: HostIP
+        external-dns.alpha.kubernetes.io/hostname: ${cluster_name}-kafka-internal.${hosted_zone_name}
+rack:
+  topologyKey: topology.kubernetes.io/zone
+metricsConfig:
+  type: jmxPrometheusExporter
+  valueFrom:
+    configMapKeyRef:
+      name: ${configmap_name}
+      key: ${configmap_key}
+# For an unprotected JMX port, use an empty object {} to open the JMX port on the headless service.
+# https://strimzi.io/docs/operators/in-development/configuring.html#type-KafkaJmxOptions-reference
+jmxOptions: {}
